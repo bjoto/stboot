@@ -14,6 +14,8 @@ import (
 
 const HostConfigVersion int = 1
 
+var ErrHostCfgInvalid = errors.New("invalid host config")
+
 type IPAddrMode int
 
 const (
@@ -54,5 +56,5 @@ type HostCfgParser interface {
 
 // LoadHostCfg returns a HostCfg using the provided pa
 func LoadHostCfg(p HostCfgParser) (*HostCfg, error) {
-	return nil, errors.New("oh no, invalid")
+	return nil, ErrHostCfgInvalid
 }

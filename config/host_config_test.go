@@ -16,7 +16,16 @@ func TestLoadHostCfg(t *testing.T) {
 	p := StubHostCfgParser{&HostCfg{}}
 
 	_, err := LoadHostCfg(p)
-	if err == nil {
-		t.Errorf("expected error")
+	assertError(t, err, ErrHostCfgInvalid)
+}
+
+func assertError(t testing.TB, got, want error) {
+	t.Helper()
+	if got == nil {
+		t.Fatal("expected an error")
+	}
+
+	if got != want {
+		t.Errorf("got %q, want %q", got, want)
 	}
 }
