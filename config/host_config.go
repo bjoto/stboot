@@ -13,15 +13,18 @@ import (
 
 const HostConfigVersion int = 1
 
-type IPAddressMode int
+type IPAddrMode int
 
 const (
-	Static IPAddressMode = iota + 1
+	UnsetIPAddrMode IPAddrMode = iota
+	Static
 	Dynamic
 )
 
-func (n IPAddressMode) String() string {
+func (n IPAddrMode) String() string {
 	switch n {
+	case UnsetIPAddrMode:
+		return "unset"
 	case Static:
 		return "static"
 	case Dynamic:
@@ -34,7 +37,7 @@ func (n IPAddressMode) String() string {
 // HostCfg contains configuration data for a System Transparency host.
 type HostCfg struct {
 	Version          int
-	NetworkMode      IPAddressMode
+	NetworkMode      IPAddrMode
 	HostIP           *netlink.Addr
 	DefaultGateway   *net.IP
 	DNSServer        *net.IP
@@ -45,5 +48,5 @@ type HostCfg struct {
 }
 
 func LoadHostCfg() *HostCfg {
-	return nil
+	return &HostCfg{}
 }
