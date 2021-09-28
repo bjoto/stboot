@@ -47,6 +47,11 @@ type HostCfg struct {
 	Auth             string
 }
 
-func LoadHostCfg() *HostCfg {
-	return &HostCfg{}
+type HostCfgParser interface {
+	Parse() (*HostCfg, error)
+}
+
+// LoadHostCfg returns a HostCfg using the provided pa
+func LoadHostCfg(p HostCfgParser) (*HostCfg, error) {
+	return &HostCfg{}, nil
 }
