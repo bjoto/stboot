@@ -6,10 +6,10 @@ import (
 )
 
 func TestLoadHostCfg(t *testing.T) {
-	want := HostCfg{}
+	want := &HostCfg{}
 	got := LoadHostCfg()
 
 	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %V, want %V", got, want)
+		t.Errorf("got %v, want %v", got, want)
 	}
 }

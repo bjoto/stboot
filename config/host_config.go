@@ -21,7 +21,14 @@ const (
 )
 
 func (n IPAddressMode) String() string {
-	return []string{"static", "dynamic"}[n-1]
+	switch n {
+	case Static:
+		return "static"
+	case Dynamic:
+		return "dynamic"
+	default:
+		return "unknown"
+	}
 }
 
 // HostCfg contains configuration data for a System Transparency host.
@@ -35,4 +42,8 @@ type HostCfg struct {
 	ProvisioningURLs []*url.URL
 	ID               string
 	Auth             string
+}
+
+func LoadHostCfg() *HostCfg {
+	return nil
 }
