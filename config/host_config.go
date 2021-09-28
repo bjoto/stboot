@@ -5,6 +5,7 @@
 package config
 
 import (
+	"errors"
 	"net"
 	"net/url"
 
@@ -53,5 +54,5 @@ type HostCfgParser interface {
 
 // LoadHostCfg returns a HostCfg using the provided pa
 func LoadHostCfg(p HostCfgParser) (*HostCfg, error) {
-	return &HostCfg{}, nil
+	return nil, errors.New("oh no, invalid")
 }
