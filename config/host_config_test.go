@@ -1,7 +1,6 @@
 package config
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -16,10 +15,8 @@ func (s StubHostCfgParser) Parse() (*HostCfg, error) {
 func TestLoadHostCfg(t *testing.T) {
 	p := StubHostCfgParser{&HostCfg{}}
 
-	want := &HostCfg{}
-	got, _ := LoadHostCfg(p)
-
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %v, want %v", got, want)
+	_, err := LoadHostCfg(p)
+	if err == nil {
+		t.Errorf("expected error")
 	}
 }
