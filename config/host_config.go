@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"strings"
 
 	"github.com/vishvananda/netlink"
 )
@@ -74,5 +75,60 @@ type HostCfgParser interface {
 
 // LoadHostCfg returns a HostCfg using the provided pa
 func LoadHostCfg(p HostCfgParser) (*HostCfg, error) {
-	return nil, InvalidError("invalid config")
+	c, _ := p.Parse()
+
+	if c.Version != HostCfgVersion {
+		return nil, ErrVersionMissmatch
+	}
+	if c.NetworkMode == UnsetIPAddrMode {
+		return nil, ErrMissingIPAddrMode
+	}
+	if c.NetworkMode > Dynamic {
+		return nil, ErrUnknownIPAddrMode
+	}
+	if c.NetworkMode == Static {
+		if c.HostIP == nil {
+			return nil, ErrMissingIPAddr
+		}
+		if c.DefaultGateway == nil {
+			return nil, ErrMissingGateway
+		}
+	}
+	if len(c.ProvisioningURLs) == 0 {
+		return nil, ErrMissingProvURLs
+	}
+	for _, u := range c.ProvisioningURLs {
+		s := u.Scheme
+		if s == "" || s != "http" && s != "https" {
+			return nil, ErrInvalidProvURLs
+		}
+		if strings.Contains(u.String(), "$ID") && c.ID == "" {
+			return nil, ErrMissingID
+		}
+		if strings.Contains(u.String(), "$AUTH") && c.Auth == "" {
+			return nil, ErrMissingAUTH
+		}
+	}
+	if c.ID != "" {
+		if len(c.ID) > 64 {
+			return nil, ErrInvalidID
+		}
+		for _, c := range c.ID {
+			if (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != '-' && c != '_' {
+				return nil, ErrInvalidID
+			}
+		}
+	}
+	if c.Auth != "" {
+		if len(c.Auth) > 64 {
+			return nil, ErrInvalidAUTH
+		}
+		for _, c := range c.Auth {
+			if (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != '-' && c != '_' {
+				return nil, ErrInvalidAUTH
+			}
+		}
+	}
+
+	return c, nil
 }
