@@ -5,16 +5,34 @@
 package config
 
 import (
-	"errors"
+	"fmt"
 	"net"
 	"net/url"
 
 	"github.com/vishvananda/netlink"
 )
 
-const HostConfigVersion int = 1
+const HostCfgVersion int = 1
 
-var ErrHostCfgInvalid = errors.New("invalid host config")
+type InvalidError string
+
+func (e InvalidError) Error() string {
+	return string(e)
+}
+
+var (
+	ErrVersionMissmatch  = InvalidError("version missmatch, want version " + fmt.Sprint(HostCfgVersion))
+	ErrMissingIPAddrMode = InvalidError("IP address mode must be set")
+	ErrUnknownIPAddrMode = InvalidError("unknown IP address mode")
+	ErrMissingProvURLs   = InvalidError("provisioning server URL list must not be empty")
+	ErrInvalidProvURLs   = InvalidError("missing or unsupported scheme in provisioning URLs")
+	ErrMissingIPAddr     = InvalidError("IP address must not be empty when static IP mode is set")
+	ErrMissingGateway    = InvalidError("default gateway must not be empty when static IP mode is set")
+	ErrMissingID         = InvalidError("ID must not be empty when a URL contains '$ID'")
+	ErrInvalidID         = InvalidError("invalid ID string, max 64 characters [a-z,A-Z,0-9,-,_]")
+	ErrMissingAUTH       = InvalidError("Auth must not be empty when a URL contains '$AUTH'")
+	ErrInvalidAUTH       = InvalidError("invalid auth string, max 64 characters [a-z,A-Z,0-9,-,_]")
+)
 
 type IPAddrMode int
 
@@ -56,5 +74,5 @@ type HostCfgParser interface {
 
 // LoadHostCfg returns a HostCfg using the provided pa
 func LoadHostCfg(p HostCfgParser) (*HostCfg, error) {
-	return nil, ErrHostCfgInvalid
+	return nil, InvalidError("invalid config")
 }
