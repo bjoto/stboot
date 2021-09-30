@@ -31,8 +31,8 @@ var (
 	ErrMissingGateway    = InvalidError("default gateway must not be empty when static IP mode is set")
 	ErrMissingID         = InvalidError("ID must not be empty when a URL contains '$ID'")
 	ErrInvalidID         = InvalidError("invalid ID string, max 64 characters [a-z,A-Z,0-9,-,_]")
-	ErrMissingAUTH       = InvalidError("Auth must not be empty when a URL contains '$AUTH'")
-	ErrInvalidAUTH       = InvalidError("invalid auth string, max 64 characters [a-z,A-Z,0-9,-,_]")
+	ErrMissingAuth       = InvalidError("Auth must not be empty when a URL contains '$AUTH'")
+	ErrInvalidAuth       = InvalidError("invalid auth string, max 64 characters [a-z,A-Z,0-9,-,_]")
 )
 
 type IPAddrMode int
@@ -77,58 +77,113 @@ type HostCfgParser interface {
 func LoadHostCfg(p HostCfgParser) (*HostCfg, error) {
 	c, _ := p.Parse()
 
-	if c.Version != HostCfgVersion {
-		return nil, ErrVersionMissmatch
-	}
-	if c.NetworkMode == UnsetIPAddrMode {
-		return nil, ErrMissingIPAddrMode
-	}
-	if c.NetworkMode > Dynamic {
-		return nil, ErrUnknownIPAddrMode
-	}
-	if c.NetworkMode == Static {
-		if c.HostIP == nil {
-			return nil, ErrMissingIPAddr
-		}
-		if c.DefaultGateway == nil {
-			return nil, ErrMissingGateway
-		}
-	}
-	if len(c.ProvisioningURLs) == 0 {
-		return nil, ErrMissingProvURLs
-	}
-	for _, u := range c.ProvisioningURLs {
-		s := u.Scheme
-		if s == "" || s != "http" && s != "https" {
-			return nil, ErrInvalidProvURLs
-		}
-		if strings.Contains(u.String(), "$ID") && c.ID == "" {
-			return nil, ErrMissingID
-		}
-		if strings.Contains(u.String(), "$AUTH") && c.Auth == "" {
-			return nil, ErrMissingAUTH
-		}
-	}
-	if c.ID != "" {
-		if len(c.ID) > 64 {
-			return nil, ErrInvalidID
-		}
-		for _, c := range c.ID {
-			if (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != '-' && c != '_' {
-				return nil, ErrInvalidID
-			}
-		}
-	}
-	if c.Auth != "" {
-		if len(c.Auth) > 64 {
-			return nil, ErrInvalidAUTH
-		}
-		for _, c := range c.Auth {
-			if (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != '-' && c != '_' {
-				return nil, ErrInvalidAUTH
-			}
+	for _, v := range hcValitators {
+		if err := v(c); err != nil {
+			return nil, err
 		}
 	}
 
 	return c, nil
+}
+
+type hcValidator func(*HostCfg) error
+
+var hcValitators = []hcValidator{
+	checkVersion,
+	checkNetworkMode,
+	checkHostIP,
+	checkGateway,
+	checkProvisioningURLs,
+	checkID,
+	checkAuth,
+}
+
+func checkVersion(c *HostCfg) error {
+	if c.Version != HostCfgVersion {
+		return ErrVersionMissmatch
+	}
+	return nil
+}
+
+func checkNetworkMode(c *HostCfg) error {
+	if c.NetworkMode == UnsetIPAddrMode {
+		return ErrMissingIPAddrMode
+	}
+	if c.NetworkMode > Dynamic {
+		return ErrUnknownIPAddrMode
+	}
+	return nil
+}
+
+func checkHostIP(c *HostCfg) error {
+	if c.NetworkMode == Static && c.HostIP == nil {
+		return ErrMissingIPAddr
+	}
+	return nil
+}
+
+func checkGateway(c *HostCfg) error {
+	if c.NetworkMode == Static && c.DefaultGateway == nil {
+		return ErrMissingGateway
+	}
+	return nil
+}
+
+func checkProvisioningURLs(c *HostCfg) error {
+	if len(c.ProvisioningURLs) == 0 {
+		return ErrMissingProvURLs
+	}
+	for _, u := range c.ProvisioningURLs {
+		s := u.Scheme
+		if s == "" || s != "http" && s != "https" {
+			return ErrInvalidProvURLs
+		}
+	}
+	return nil
+}
+
+func checkID(c *HostCfg) error {
+	var isUsed bool
+	for _, u := range c.ProvisioningURLs {
+		if isUsed = strings.Contains(u.String(), "$ID"); isUsed {
+			break
+		}
+	}
+	if isUsed {
+		if c.ID == "" {
+			return ErrMissingID
+		} else if !hasAllowdChars(c.ID) {
+			return ErrInvalidID
+		}
+	}
+	return nil
+}
+
+func checkAuth(c *HostCfg) error {
+	var isUsed bool
+	for _, u := range c.ProvisioningURLs {
+		if isUsed = strings.Contains(u.String(), "$AUTH"); isUsed {
+			break
+		}
+	}
+	if isUsed {
+		if c.Auth == "" {
+			return ErrMissingAuth
+		} else if !hasAllowdChars(c.Auth) {
+			return ErrInvalidAuth
+		}
+	}
+	return nil
+}
+
+func hasAllowdChars(s string) bool {
+	if len(s) > 64 {
+		return false
+	}
+	for _, c := range s {
+		if (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != '-' && c != '_' {
+			return false
+		}
+	}
+	return true
 }

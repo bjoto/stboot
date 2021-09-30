@@ -203,7 +203,7 @@ func TestLoadHostCfg(t *testing.T) {
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 			},
-			want: ErrMissingAUTH,
+			want: ErrMissingAuth,
 		},
 		{
 			name: "Invalid Auth 1",
@@ -214,7 +214,7 @@ func TestLoadHostCfg(t *testing.T) {
 				ID:               "abc",
 				Auth:             "abc/1",
 			},
-			want: ErrInvalidAUTH,
+			want: ErrInvalidAuth,
 		},
 		{
 			name: "Invalid Auth 2",
@@ -225,7 +225,7 @@ func TestLoadHostCfg(t *testing.T) {
 				ID:               "abc",
 				Auth:             "abc:1",
 			},
-			want: ErrInvalidAUTH,
+			want: ErrInvalidAuth,
 		},
 		{
 			name: "Invalid Auth 3",
@@ -236,7 +236,7 @@ func TestLoadHostCfg(t *testing.T) {
 				ID:               "abc",
 				Auth:             "abc@1",
 			},
-			want: ErrInvalidAUTH,
+			want: ErrInvalidAuth,
 		},
 		{
 			name: "Invalid Auth 4",
@@ -247,7 +247,7 @@ func TestLoadHostCfg(t *testing.T) {
 				ID:               "abc",
 				Auth:             strings.Repeat("a", 65),
 			},
-			want: ErrInvalidAUTH,
+			want: ErrInvalidAuth,
 		},
 	}
 
