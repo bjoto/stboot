@@ -28,7 +28,7 @@ func TestLoadHostCfg(t *testing.T) {
 	gw := net.ParseIP("127.0.0.1")
 	ip, _ := netlink.ParseAddr("127.0.0.1/24")
 
-	validTests := []struct {
+	validHostCfgTests := []struct {
 		name string
 		cfg  *HostCfg
 	}{
@@ -52,7 +52,7 @@ func TestLoadHostCfg(t *testing.T) {
 		},
 	}
 
-	for _, tt := range validTests {
+	for _, tt := range validHostCfgTests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := StubHostCfgParser{tt.cfg}
 			_, err := LoadHostCfg(p)
@@ -61,7 +61,7 @@ func TestLoadHostCfg(t *testing.T) {
 		})
 	}
 
-	invalidTests := []struct {
+	invalidHostCfgTests := []struct {
 		name string
 		cfg  *HostCfg
 		want error
@@ -72,7 +72,7 @@ func TestLoadHostCfg(t *testing.T) {
 				NetworkMode:      Dynamic,
 				ProvisioningURLs: []*url.URL{validURL1},
 			},
-			want: ErrVersionMissmatch,
+			want: ErrHostCfgVersionMissmatch,
 		},
 		{
 			name: "Version missmatch",
@@ -81,7 +81,7 @@ func TestLoadHostCfg(t *testing.T) {
 				NetworkMode:      Dynamic,
 				ProvisioningURLs: []*url.URL{validURL1},
 			},
-			want: ErrVersionMissmatch,
+			want: ErrHostCfgVersionMissmatch,
 		},
 		{
 			name: "Missing IP address mode",
@@ -251,7 +251,7 @@ func TestLoadHostCfg(t *testing.T) {
 		},
 	}
 
-	for _, tt := range invalidTests {
+	for _, tt := range invalidHostCfgTests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := StubHostCfgParser{tt.cfg}
 			_, err := LoadHostCfg(p)

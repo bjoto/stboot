@@ -22,17 +22,17 @@ func (e InvalidError) Error() string {
 }
 
 var (
-	ErrVersionMissmatch  = InvalidError("version missmatch, want version " + fmt.Sprint(HostCfgVersion))
-	ErrMissingIPAddrMode = InvalidError("IP address mode must be set")
-	ErrUnknownIPAddrMode = InvalidError("unknown IP address mode")
-	ErrMissingProvURLs   = InvalidError("provisioning server URL list must not be empty")
-	ErrInvalidProvURLs   = InvalidError("missing or unsupported scheme in provisioning URLs")
-	ErrMissingIPAddr     = InvalidError("IP address must not be empty when static IP mode is set")
-	ErrMissingGateway    = InvalidError("default gateway must not be empty when static IP mode is set")
-	ErrMissingID         = InvalidError("ID must not be empty when a URL contains '$ID'")
-	ErrInvalidID         = InvalidError("invalid ID string, max 64 characters [a-z,A-Z,0-9,-,_]")
-	ErrMissingAuth       = InvalidError("Auth must not be empty when a URL contains '$AUTH'")
-	ErrInvalidAuth       = InvalidError("invalid auth string, max 64 characters [a-z,A-Z,0-9,-,_]")
+	ErrHostCfgVersionMissmatch = InvalidError("version missmatch, want version " + fmt.Sprint(HostCfgVersion))
+	ErrMissingIPAddrMode       = InvalidError("IP address mode must be set")
+	ErrUnknownIPAddrMode       = InvalidError("unknown IP address mode")
+	ErrMissingProvURLs         = InvalidError("provisioning server URL list must not be empty")
+	ErrInvalidProvURLs         = InvalidError("missing or unsupported scheme in provisioning URLs")
+	ErrMissingIPAddr           = InvalidError("IP address must not be empty when static IP mode is set")
+	ErrMissingGateway          = InvalidError("default gateway must not be empty when static IP mode is set")
+	ErrMissingID               = InvalidError("ID must not be empty when a URL contains '$ID'")
+	ErrInvalidID               = InvalidError("invalid ID string, max 64 characters [a-z,A-Z,0-9,-,_]")
+	ErrMissingAuth             = InvalidError("Auth must not be empty when a URL contains '$AUTH'")
+	ErrInvalidAuth             = InvalidError("invalid auth string, max 64 characters [a-z,A-Z,0-9,-,_]")
 )
 
 type IPAddrMode int
@@ -73,11 +73,11 @@ type HostCfgParser interface {
 	Parse() (*HostCfg, error)
 }
 
-// LoadHostCfg returns a HostCfg using the provided pa
+// LoadHostCfg returns a HostCfg using the provided parser
 func LoadHostCfg(p HostCfgParser) (*HostCfg, error) {
 	c, _ := p.Parse()
 
-	for _, v := range hcValitators {
+	for _, v := range hcValidators {
 		if err := v(c); err != nil {
 			return nil, err
 		}
@@ -88,8 +88,8 @@ func LoadHostCfg(p HostCfgParser) (*HostCfg, error) {
 
 type hcValidator func(*HostCfg) error
 
-var hcValitators = []hcValidator{
-	checkVersion,
+var hcValidators = []hcValidator{
+	checkHostCfgVersion,
 	checkNetworkMode,
 	checkHostIP,
 	checkGateway,
@@ -98,9 +98,9 @@ var hcValitators = []hcValidator{
 	checkAuth,
 }
 
-func checkVersion(c *HostCfg) error {
+func checkHostCfgVersion(c *HostCfg) error {
 	if c.Version != HostCfgVersion {
-		return ErrVersionMissmatch
+		return ErrHostCfgVersionMissmatch
 	}
 	return nil
 }
