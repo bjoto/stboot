@@ -8,6 +8,12 @@ import "fmt"
 
 const SecurityCfgVersion int = 1
 
+var (
+	ErrSecurityCfgVersionMissmatch = InvalidError("version missmatch, want version " + fmt.Sprint(SecurityCfgVersion))
+	ErrMissingBootMode             = InvalidError("boot mode must be set")
+	ErrUnknownBootMode             = InvalidError("unknown boot mode")
+)
+
 type BootMode int
 
 const (
@@ -29,12 +35,6 @@ func (b BootMode) String() string {
 	}
 }
 
-var (
-	ErrSecurityCfgVersionMissmatch = InvalidError("version missmatch, want version " + fmt.Sprint(SecurityCfgVersion))
-	ErrMissingBootMode             = InvalidError("boot mode must be set")
-	ErrUnknownBootMode             = InvalidError("unknown boot mode")
-)
-
 // SecurityConfig contains security critical configuration data for a System Transparency host.
 type SecurityCfg struct {
 	Version                 int
@@ -42,25 +42,6 @@ type SecurityCfg struct {
 	BootMode                BootMode
 	UsePkgCache             bool
 }
-
-type SecurityCfgParser interface {
-	Parse() (*SecurityCfg, error)
-}
-
-// LoadSecuritCfg returns a SecurityCfg using the provided parser
-func LoadSecurityCfg(p SecurityCfgParser) (*SecurityCfg, error) {
-	c, _ := p.Parse()
-
-	for _, v := range scValidators {
-		if err := v(c); err != nil {
-			return nil, err
-		}
-	}
-
-	return c, nil
-}
-
-type scValidator func(*SecurityCfg) error
 
 var scValidators = []scValidator{
 	checkSecurityConfigVersion,

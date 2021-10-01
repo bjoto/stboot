@@ -15,12 +15,6 @@ import (
 
 const HostCfgVersion int = 1
 
-type InvalidError string
-
-func (e InvalidError) Error() string {
-	return string(e)
-}
-
 var (
 	ErrHostCfgVersionMissmatch = InvalidError("version missmatch, want version " + fmt.Sprint(HostCfgVersion))
 	ErrMissingIPAddrMode       = InvalidError("IP address mode must be set")
@@ -68,25 +62,6 @@ type HostCfg struct {
 	ID               string
 	Auth             string
 }
-
-type HostCfgParser interface {
-	Parse() (*HostCfg, error)
-}
-
-// LoadHostCfg returns a HostCfg using the provided parser
-func LoadHostCfg(p HostCfgParser) (*HostCfg, error) {
-	c, _ := p.Parse()
-
-	for _, v := range hcValidators {
-		if err := v(c); err != nil {
-			return nil, err
-		}
-	}
-
-	return c, nil
-}
-
-type hcValidator func(*HostCfg) error
 
 var hcValidators = []hcValidator{
 	checkHostCfgVersion,
