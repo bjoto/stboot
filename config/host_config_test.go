@@ -36,7 +36,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Minimum valid config with dynamic IP address",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 			},
 		},
@@ -44,7 +44,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Minimum valid config with static IP address",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Static,
+				NetworkMode:      StaticIP,
 				HostIP:           ip,
 				DefaultGateway:   &gw,
 				ProvisioningURLs: []*url.URL{validURL1},
@@ -69,7 +69,7 @@ func TestLoadHostCfg(t *testing.T) {
 		{
 			name: "Missing version",
 			cfg: &HostCfg{
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 			},
 			want: ErrHostCfgVersionMissmatch,
@@ -78,7 +78,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Version missmatch",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion + 1,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 			},
 			want: ErrHostCfgVersionMissmatch,
@@ -104,7 +104,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Missing IP address",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Static,
+				NetworkMode:      StaticIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 				DefaultGateway:   &gw,
 			},
@@ -114,7 +114,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Missing gateway",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Static,
+				NetworkMode:      StaticIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 				HostIP:           ip,
 			},
@@ -124,7 +124,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Missing URLs",
 			cfg: &HostCfg{
 				Version:     HostCfgVersion,
-				NetworkMode: Dynamic,
+				NetworkMode: DynamicIP,
 			},
 			want: ErrMissingProvURLs,
 		},
@@ -132,7 +132,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid URLs 1",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL1, invalidURL1},
 			},
 			want: ErrInvalidProvURLs,
@@ -141,7 +141,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid URLs 2",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL2, invalidURL2},
 			},
 			want: ErrInvalidProvURLs,
@@ -150,7 +150,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Missing ID",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 			},
 			want: ErrMissingID,
@@ -159,7 +159,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid ID 1",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 				ID:               "abc/1",
 			},
@@ -169,7 +169,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid ID 2",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 				ID:               "abc:1",
 			},
@@ -179,7 +179,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid ID 3",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 				ID:               "abc@1",
 			},
@@ -189,7 +189,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid ID 4",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 				ID:               strings.Repeat("a", 65),
 			},
@@ -199,7 +199,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Missing Auth",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 			},
@@ -209,7 +209,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid Auth 1",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 				Auth:             "abc/1",
@@ -220,7 +220,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid Auth 2",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 				Auth:             "abc:1",
@@ -231,7 +231,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid Auth 3",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 				Auth:             "abc@1",
@@ -242,7 +242,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid Auth 4",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      Dynamic,
+				NetworkMode:      DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 				Auth:             strings.Repeat("a", 65),
@@ -276,5 +276,43 @@ func assertNoError(t testing.TB, got error) {
 	t.Helper()
 	if got != nil {
 		t.Errorf("didn't expect an error but got %q", got)
+	}
+}
+
+func TestIPAddrMode(t *testing.T) {
+	tests := []struct {
+		name string
+		mode IPAddrMode
+		want string
+	}{
+		{
+			name: "String for default value",
+			mode: UnsetIPAddrMode,
+			want: "unset",
+		},
+		{
+			name: "String for 'StaticIP'",
+			mode: StaticIP,
+			want: "static",
+		},
+		{
+			name: "String for 'DynamicIP'",
+			mode: DynamicIP,
+			want: "dynamic",
+		},
+		{
+			name: "String for unknown value",
+			mode: 3,
+			want: "unknown",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.mode.String()
+			if got != tt.want {
+				t.Errorf("got %q, want %q", got, tt.want)
+			}
+		})
 	}
 }

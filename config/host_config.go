@@ -33,17 +33,17 @@ type IPAddrMode int
 
 const (
 	UnsetIPAddrMode IPAddrMode = iota
-	Static
-	Dynamic
+	StaticIP
+	DynamicIP
 )
 
 func (n IPAddrMode) String() string {
 	switch n {
 	case UnsetIPAddrMode:
 		return "unset"
-	case Static:
+	case StaticIP:
 		return "static"
-	case Dynamic:
+	case DynamicIP:
 		return "dynamic"
 	default:
 		return "unknown"
@@ -84,21 +84,21 @@ func checkNetworkMode(c *HostCfg) error {
 	if c.NetworkMode == UnsetIPAddrMode {
 		return ErrMissingIPAddrMode
 	}
-	if c.NetworkMode > Dynamic {
+	if c.NetworkMode > DynamicIP {
 		return ErrUnknownIPAddrMode
 	}
 	return nil
 }
 
 func checkHostIP(c *HostCfg) error {
-	if c.NetworkMode == Static && c.HostIP == nil {
+	if c.NetworkMode == StaticIP && c.HostIP == nil {
 		return ErrMissingIPAddr
 	}
 	return nil
 }
 
 func checkGateway(c *HostCfg) error {
-	if c.NetworkMode == Static && c.DefaultGateway == nil {
+	if c.NetworkMode == StaticIP && c.DefaultGateway == nil {
 		return ErrMissingGateway
 	}
 	return nil
