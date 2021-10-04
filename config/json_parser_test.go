@@ -9,7 +9,7 @@ import (
 func TestJSONParser(t *testing.T) {
 	json := `{ "version" :1 }`
 	j := JSONParser{bytes.NewBufferString(json)}
-	want := HostCfg{Version: 1}
+	want := &HostCfg{Version: 1}
 
 	got, err := j.Parse()
 
