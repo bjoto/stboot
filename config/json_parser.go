@@ -33,11 +33,11 @@ func (t *TypeError) Error() string {
 
 type ParseError struct {
 	Key string
-	err error
+	Err error
 }
 
 func (p *ParseError) Error() string {
-	return fmt.Sprintf("parsing value of JSON key %s failed: %v", p.Key, p.err)
+	return fmt.Sprintf("parsing value of JSON key %s failed: %v", p.Key, p.Err)
 }
 
 type rawCfg map[string]interface{}

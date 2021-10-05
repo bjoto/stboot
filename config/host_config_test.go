@@ -275,7 +275,7 @@ func assertError(t testing.TB, got, want error) {
 func assertNoError(t testing.TB, got error) {
 	t.Helper()
 	if got != nil {
-		t.Errorf("didn't expect an error but got %q", got)
+		t.Errorf("didn't expect an error but got: %v", got)
 	}
 }
 
