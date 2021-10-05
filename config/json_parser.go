@@ -6,6 +6,18 @@ import (
 	"io"
 )
 
+const (
+	VersionJSONKey          = "version"
+	NetworkModeJSONKey      = "network_mode"
+	HostIPJSONKey           = "host_ip"
+	DefaultGatewayJSONKey   = "gateway"
+	DNSServerJSONKey        = "dns"
+	NetworkInterfaceJSONKey = "network_interface"
+	ProvisioningURLsJSONKey = "provisioning_urls"
+	IdJSONKey               = "identity"
+	AuthJSONKey             = "authentication"
+)
+
 type JSONParser struct {
 	r io.Reader
 }
@@ -24,7 +36,7 @@ func (p *JSONParser) Parse() (*HostCfg, error) {
 	if val, ok := m["version"]; ok {
 		ver, ok := val.(float64)
 		if !ok {
-			return nil, fmt.Errorf("for key 'version' want number, got %T", val)
+			return nil, fmt.Errorf("for key 'version': want number, got %T", val)
 		}
 		return &HostCfg{Version: int(ver)}, nil
 	}
