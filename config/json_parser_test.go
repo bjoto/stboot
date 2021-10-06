@@ -21,7 +21,7 @@ const (
 func TestJSONParser(t *testing.T) {
 	v := valuesFromGoodStrings(t)
 
-	tests := []struct {
+	goodTests := []struct {
 		name string
 		json string
 		want *HostCfg
@@ -93,7 +93,57 @@ func TestJSONParser(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
+	badValueTests := []struct {
+		name string
+		json string
+		key  string
+	}{
+		{
+			name: "Bad network mode string",
+			json: fmt.Sprintf(`{"%s": "some string"}`, NetworkInterfaceJSONKey),
+			key:  NetworkInterfaceJSONKey,
+		},
+		{
+			name: "Bad host IP address string",
+			json: fmt.Sprintf(`{"%s": "some string"}`, HostIPJSONKey),
+			key:  HostIPJSONKey,
+		},
+		{
+			name: "Bad gateway IP address string",
+			json: fmt.Sprintf(`{"%s": "some string"}`, DefaultGatewayJSONKey),
+			key:  DefaultGatewayJSONKey,
+		},
+		{
+			name: "Bad DNS server IP address string",
+			json: fmt.Sprintf(`{"%s": "some string"}`, DNSServerJSONKey),
+			key:  DNSServerJSONKey,
+		},
+		{
+			name: "Bad network interface address string",
+			json: fmt.Sprintf(`{"%s": "some string"}`, NetworkInterfaceJSONKey),
+			key:  NetworkInterfaceJSONKey,
+		},
+	}
+
+	badTypeTests := []struct {
+		name string
+		json string
+	}{
+		{
+			name: "Bad version type",
+			json: fmt.Sprintf(`{"%s": "one"}`, VersionJSONKey),
+		},
+		{
+			name: "Bad network mode type",
+			json: fmt.Sprintf(`{"%s": 1}`, NetworkModeJSONKey),
+		},
+		{
+			name: "Bad provisioning url type",
+			json: fmt.Sprintf(`{"%s": 1}`, ProvisioningURLsJSONKey),
+		},
+	}
+
+	for _, tt := range goodTests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := JSONParser{bytes.NewBufferString(tt.json)}
 
@@ -104,6 +154,44 @@ func TestJSONParser(t *testing.T) {
 				t.Errorf("got %+v, want %+v", got, tt.want)
 			}
 		})
+	}
+
+	for _, tt := range badTypeTests {
+		t.Run(tt.name, func(t *testing.T) {
+			j := JSONParser{bytes.NewBufferString(tt.json)}
+
+			_, err := j.Parse()
+
+			assertTypeError(t, err)
+		})
+	}
+
+	for _, tt := range badValueTests {
+		t.Run(tt.name, func(t *testing.T) {
+			j := JSONParser{bytes.NewBufferString(tt.json)}
+
+			_, err := j.Parse()
+
+			assertParseError(t, err, tt.key)
+		})
+	}
+}
+
+func assertTypeError(t *testing.T, err error) {
+	t.Helper()
+	if _, ok := err.(*TypeError); !ok {
+		t.Errorf("want TypeError, got %T", err)
+	}
+}
+
+func assertParseError(t *testing.T, err error, key string) {
+	t.Helper()
+	e, ok := err.(*ParseError)
+	if !ok {
+		t.Fatalf("want ParseError, got %T", err)
+	}
+	if e.Key != key {
+		t.Errorf("want ParseError for JSON key %q, but got: %v", key, err)
 	}
 }
 
