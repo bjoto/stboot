@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	VersionJSONKey          = "version"
+	HostCfgVersionJSONKey   = "version"
 	NetworkModeJSONKey      = "network_mode"
 	HostIPJSONKey           = "host_ip"
 	DefaultGatewayJSONKey   = "gateway"
@@ -42,10 +42,10 @@ func (p *ParseError) Error() string {
 
 type rawCfg map[string]interface{}
 
-type parser func(rawCfg, *HostCfg) error
+type hostCfgParser func(rawCfg, *HostCfg) error
 
-var parsers = []parser{
-	parseVersion,
+var hostCfgParsers = []hostCfgParser{
+	parseHostCfgVersion,
 	parseNetworkMode,
 	parseHostIP,
 	parseDefaultGateway,
@@ -56,12 +56,12 @@ var parsers = []parser{
 	parseAuth,
 }
 
-type JSONParser struct {
+type HostCfgJSONParser struct {
 	r io.Reader
 }
 
-func (p *JSONParser) Parse() (*HostCfg, error) {
-	jsonBlob, err := io.ReadAll(p.r)
+func (hp *HostCfgJSONParser) Parse() (*HostCfg, error) {
+	jsonBlob, err := io.ReadAll(hp.r)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (p *JSONParser) Parse() (*HostCfg, error) {
 	}
 
 	cfg := &HostCfg{}
-	for _, p := range parsers {
+	for _, p := range hostCfgParsers {
 		if err := p(raw, cfg); err != nil {
 			return nil, err
 		}
@@ -80,8 +80,8 @@ func (p *JSONParser) Parse() (*HostCfg, error) {
 	return cfg, nil
 }
 
-func parseVersion(r rawCfg, c *HostCfg) error {
-	key := VersionJSONKey
+func parseHostCfgVersion(r rawCfg, c *HostCfg) error {
+	key := HostCfgVersionJSONKey
 	if val, found := r[key]; found {
 		if ver, ok := val.(float64); ok {
 			c.Version = int(ver)

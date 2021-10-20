@@ -18,7 +18,7 @@ const (
 	goodURLString  = "http://server.com"
 )
 
-func TestJSONParser(t *testing.T) {
+func TestHostCfgJSONParser(t *testing.T) {
 	v := valuesFromGoodStrings(t)
 
 	goodTests := []struct {
@@ -28,7 +28,7 @@ func TestJSONParser(t *testing.T) {
 	}{
 		{
 			name: "Version field",
-			json: fmt.Sprintf(`{"%s": 1}`, VersionJSONKey),
+			json: fmt.Sprintf(`{"%s": 1}`, HostCfgVersionJSONKey),
 			want: &HostCfg{Version: 1},
 		},
 		{
@@ -88,7 +88,7 @@ func TestJSONParser(t *testing.T) {
 		},
 		{
 			name: "Empty fields",
-			json: fmt.Sprintf(`{"%s": 0, "%s": "", "%s": "", "%s": "", "%s": "", "%s": "", "%s": [], "%s": "", "%s": ""}`, VersionJSONKey, NetworkModeJSONKey, HostIPJSONKey, DefaultGatewayJSONKey, DNSServerJSONKey, NetworkInterfaceJSONKey, ProvisioningURLsJSONKey, IdJSONKey, AuthJSONKey),
+			json: fmt.Sprintf(`{"%s": 0, "%s": "", "%s": "", "%s": "", "%s": "", "%s": "", "%s": [], "%s": "", "%s": ""}`, HostCfgVersionJSONKey, NetworkModeJSONKey, HostIPJSONKey, DefaultGatewayJSONKey, DNSServerJSONKey, NetworkInterfaceJSONKey, ProvisioningURLsJSONKey, IdJSONKey, AuthJSONKey),
 			want: &HostCfg{},
 		},
 	}
@@ -131,7 +131,7 @@ func TestJSONParser(t *testing.T) {
 	}{
 		{
 			name: "Bad version type",
-			json: fmt.Sprintf(`{"%s": "one"}`, VersionJSONKey),
+			json: fmt.Sprintf(`{"%s": "one"}`, HostCfgVersionJSONKey),
 		},
 		{
 			name: "Bad network mode type",
@@ -145,7 +145,7 @@ func TestJSONParser(t *testing.T) {
 
 	for _, tt := range goodTests {
 		t.Run(tt.name, func(t *testing.T) {
-			j := JSONParser{bytes.NewBufferString(tt.json)}
+			j := HostCfgJSONParser{bytes.NewBufferString(tt.json)}
 
 			got, err := j.Parse()
 
@@ -158,7 +158,7 @@ func TestJSONParser(t *testing.T) {
 
 	for _, tt := range badTypeTests {
 		t.Run(tt.name, func(t *testing.T) {
-			j := JSONParser{bytes.NewBufferString(tt.json)}
+			j := HostCfgJSONParser{bytes.NewBufferString(tt.json)}
 
 			_, err := j.Parse()
 
@@ -168,7 +168,7 @@ func TestJSONParser(t *testing.T) {
 
 	for _, tt := range badValueTests {
 		t.Run(tt.name, func(t *testing.T) {
-			j := JSONParser{bytes.NewBufferString(tt.json)}
+			j := HostCfgJSONParser{bytes.NewBufferString(tt.json)}
 
 			_, err := j.Parse()
 
