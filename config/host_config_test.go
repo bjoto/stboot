@@ -36,7 +36,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Minimum valid config with dynamic IP address",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 			},
 		},
@@ -44,7 +44,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Minimum valid config with static IP address",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      StaticIP,
+				IPAddrMode:       StaticIP,
 				HostIP:           ip,
 				DefaultGateway:   &gw,
 				ProvisioningURLs: []*url.URL{validURL1},
@@ -69,7 +69,7 @@ func TestLoadHostCfg(t *testing.T) {
 		{
 			name: "Missing version",
 			cfg: &HostCfg{
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 			},
 			want: ErrHostCfgVersionMissmatch,
@@ -78,7 +78,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Version missmatch",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion + 1,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 			},
 			want: ErrHostCfgVersionMissmatch,
@@ -95,7 +95,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Unknown IP address mode",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      3,
+				IPAddrMode:       3,
 				ProvisioningURLs: []*url.URL{validURL1},
 			},
 			want: ErrUnknownIPAddrMode,
@@ -104,7 +104,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Missing IP address",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      StaticIP,
+				IPAddrMode:       StaticIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 				DefaultGateway:   &gw,
 			},
@@ -114,7 +114,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Missing gateway",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      StaticIP,
+				IPAddrMode:       StaticIP,
 				ProvisioningURLs: []*url.URL{validURL1},
 				HostIP:           ip,
 			},
@@ -123,8 +123,8 @@ func TestLoadHostCfg(t *testing.T) {
 		{
 			name: "Missing URLs",
 			cfg: &HostCfg{
-				Version:     HostCfgVersion,
-				NetworkMode: DynamicIP,
+				Version:    HostCfgVersion,
+				IPAddrMode: DynamicIP,
 			},
 			want: ErrMissingProvURLs,
 		},
@@ -132,7 +132,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid URLs 1",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL1, invalidURL1},
 			},
 			want: ErrInvalidProvURLs,
@@ -141,7 +141,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid URLs 2",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{validURL2, invalidURL2},
 			},
 			want: ErrInvalidProvURLs,
@@ -150,7 +150,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Missing ID",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 			},
 			want: ErrMissingID,
@@ -159,7 +159,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid ID 1",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 				ID:               "abc/1",
 			},
@@ -169,7 +169,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid ID 2",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 				ID:               "abc:1",
 			},
@@ -179,7 +179,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid ID 3",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 				ID:               "abc@1",
 			},
@@ -189,7 +189,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid ID 4",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithID},
 				ID:               strings.Repeat("a", 65),
 			},
@@ -199,7 +199,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Missing Auth",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 			},
@@ -209,7 +209,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid Auth 1",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 				Auth:             "abc/1",
@@ -220,7 +220,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid Auth 2",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 				Auth:             "abc:1",
@@ -231,7 +231,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid Auth 3",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 				Auth:             "abc@1",
@@ -242,7 +242,7 @@ func TestLoadHostCfg(t *testing.T) {
 			name: "Invalid Auth 4",
 			cfg: &HostCfg{
 				Version:          HostCfgVersion,
-				NetworkMode:      DynamicIP,
+				IPAddrMode:       DynamicIP,
 				ProvisioningURLs: []*url.URL{urlWithIDandAuth},
 				ID:               "abc",
 				Auth:             strings.Repeat("a", 65),

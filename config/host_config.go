@@ -52,8 +52,8 @@ func (n IPAddrMode) String() string {
 
 // HostCfg contains configuration data for a System Transparency host.
 type HostCfg struct {
-	Version          int
-	NetworkMode      IPAddrMode
+	Version int
+	IPAddrMode
 	HostIP           *netlink.Addr
 	DefaultGateway   *net.IP
 	DNSServer        *net.IP
@@ -81,24 +81,24 @@ func checkHostCfgVersion(c *HostCfg) error {
 }
 
 func checkNetworkMode(c *HostCfg) error {
-	if c.NetworkMode == UnsetIPAddrMode {
+	if c.IPAddrMode == UnsetIPAddrMode {
 		return ErrMissingIPAddrMode
 	}
-	if c.NetworkMode > DynamicIP {
+	if c.IPAddrMode > DynamicIP {
 		return ErrUnknownIPAddrMode
 	}
 	return nil
 }
 
 func checkHostIP(c *HostCfg) error {
-	if c.NetworkMode == StaticIP && c.HostIP == nil {
+	if c.IPAddrMode == StaticIP && c.HostIP == nil {
 		return ErrMissingIPAddr
 	}
 	return nil
 }
 
 func checkGateway(c *HostCfg) error {
-	if c.NetworkMode == StaticIP && c.DefaultGateway == nil {
+	if c.IPAddrMode == StaticIP && c.DefaultGateway == nil {
 		return ErrMissingGateway
 	}
 	return nil

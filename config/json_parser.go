@@ -98,11 +98,11 @@ func parseNetworkMode(r rawCfg, c *HostCfg) error {
 		if m, ok := val.(string); ok {
 			switch m {
 			case "", UnsetIPAddrMode.String():
-				c.NetworkMode = UnsetIPAddrMode
+				c.IPAddrMode = UnsetIPAddrMode
 			case StaticIP.String():
-				c.NetworkMode = StaticIP
+				c.IPAddrMode = StaticIP
 			case DynamicIP.String():
-				c.NetworkMode = DynamicIP
+				c.IPAddrMode = DynamicIP
 			default:
 				return &ParseError{key, fmt.Errorf("unknown network mode %q", m)}
 			}

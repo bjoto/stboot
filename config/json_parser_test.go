@@ -34,12 +34,12 @@ func TestJSONParser(t *testing.T) {
 		{
 			name: "Network mode field 1",
 			json: fmt.Sprintf(`{"%s": "%s"}`, NetworkModeJSONKey, StaticIP.String()),
-			want: &HostCfg{NetworkMode: StaticIP},
+			want: &HostCfg{IPAddrMode: StaticIP},
 		},
 		{
 			name: "Network mode field 2",
 			json: fmt.Sprintf(`{"%s": "%s"}`, NetworkModeJSONKey, DynamicIP.String()),
-			want: &HostCfg{NetworkMode: DynamicIP},
+			want: &HostCfg{IPAddrMode: DynamicIP},
 		},
 		{
 			name: "Host IP field",
