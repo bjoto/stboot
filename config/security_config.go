@@ -39,8 +39,8 @@ func (b BootMode) String() string {
 type SecurityCfg struct {
 	Version                 int
 	ValidSignatureThreshold uint
-	BootMode                BootMode
-	UsePkgCache             bool
+	BootMode
+	UsePkgCache bool
 }
 
 var scValidators = []scValidator{
