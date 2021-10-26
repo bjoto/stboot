@@ -65,7 +65,7 @@ func TestLoadSecurityCfg(t *testing.T) {
 			want: ErrSecurityCfgVersionMissmatch,
 		},
 		{
-			name: "Missing boot mode",
+			name: "Empty boot mode",
 			cfg: &SecurityCfg{
 				Version: SecurityCfgVersion,
 			},

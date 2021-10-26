@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net"
 	"net/url"
@@ -100,8 +101,8 @@ func TestHostCfgJSONParser(t *testing.T) {
 	}{
 		{
 			name: "Bad network mode string",
-			json: fmt.Sprintf(`{"%s": "some string"}`, NetworkInterfaceJSONKey),
-			key:  NetworkInterfaceJSONKey,
+			json: fmt.Sprintf(`{"%s": "some string"}`, NetworkModeJSONKey),
+			key:  NetworkModeJSONKey,
 		},
 		{
 			name: "Bad host IP address string",
@@ -123,6 +124,11 @@ func TestHostCfgJSONParser(t *testing.T) {
 			json: fmt.Sprintf(`{"%s": "some string"}`, NetworkInterfaceJSONKey),
 			key:  NetworkInterfaceJSONKey,
 		},
+		{
+			name: "Bad provisioning url string",
+			json: fmt.Sprintf(`{"%s": ["missing.scheme/in/url"]}`, ProvisioningURLsJSONKey),
+			key:  ProvisioningURLsJSONKey,
+		},
 	}
 
 	badTypeTests := []struct {
@@ -138,8 +144,36 @@ func TestHostCfgJSONParser(t *testing.T) {
 			json: fmt.Sprintf(`{"%s": 1}`, NetworkModeJSONKey),
 		},
 		{
+			name: "Bad host IP type",
+			json: fmt.Sprintf(`{"%s": 1}`, HostIPJSONKey),
+		},
+		{
+			name: "Bad default gateway type",
+			json: fmt.Sprintf(`{"%s": 1}`, DefaultGatewayJSONKey),
+		},
+		{
+			name: "Bad DNS type",
+			json: fmt.Sprintf(`{"%s": 1}`, DNSServerJSONKey),
+		},
+		{
+			name: "Bad network interface type",
+			json: fmt.Sprintf(`{"%s": 1}`, NetworkInterfaceJSONKey),
+		},
+		{
 			name: "Bad provisioning url type",
 			json: fmt.Sprintf(`{"%s": 1}`, ProvisioningURLsJSONKey),
+		},
+		{
+			name: "Bad provisioning url type 2",
+			json: fmt.Sprintf(`{"%s": [1, 1]}`, ProvisioningURLsJSONKey),
+		},
+		{
+			name: "Bad id type",
+			json: fmt.Sprintf(`{"%s": 1}`, IdJSONKey),
+		},
+		{
+			name: "Bad auth type",
+			json: fmt.Sprintf(`{"%s": 1}`, AuthJSONKey),
 		},
 	}
 
@@ -175,6 +209,35 @@ func TestHostCfgJSONParser(t *testing.T) {
 			assertParseError(t, err, tt.key)
 		})
 	}
+}
+
+type badReader struct{}
+
+func (r *badReader) Read(b []byte) (n int, err error) {
+	return 0, errors.New("bad read")
+}
+
+func TestBadHostCfgJSONParser(t *testing.T) {
+
+	t.Run("Invalid JSON", func(t *testing.T) {
+		j := HostCfgJSONParser{bytes.NewBufferString("bad json")}
+
+		_, err := j.Parse()
+
+		if err == nil {
+			t.Error("expect error but got none")
+		}
+	})
+
+	t.Run("Bad reader", func(t *testing.T) {
+		j := HostCfgJSONParser{&badReader{}}
+
+		_, err := j.Parse()
+
+		if err == nil {
+			t.Error("expect error but got none")
+		}
+	})
 }
 
 func assertTypeError(t *testing.T, err error) {

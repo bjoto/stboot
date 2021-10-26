@@ -79,7 +79,7 @@ func parseBootMode(r rawCfg, c *SecurityCfg) error {
 	if val, found := r[key]; found {
 		if m, ok := val.(string); ok {
 			switch m {
-			case "", UnsetIPAddrMode.String():
+			case "", UnsetBootMode.String():
 				c.BootMode = UnsetBootMode
 			case LocalBoot.String():
 				c.BootMode = LocalBoot

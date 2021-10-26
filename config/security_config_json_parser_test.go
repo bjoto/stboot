@@ -39,6 +39,16 @@ func TestSecurityCfgJSONParser(t *testing.T) {
 			json: fmt.Sprintf(`{"%s": true}`, UsePkgCacheJSONKey),
 			want: &SecurityCfg{UsePkgCache: true},
 		},
+		{
+			name: "No fields",
+			json: `{}`,
+			want: &SecurityCfg{},
+		},
+		{
+			name: "Empty fields",
+			json: fmt.Sprintf(`{"%s": 0, "%s": 0, "%s": ""}`, SecurityCfgVersionJSONKey, ValidSignatureThresholdJSONKey, BootModeJSONKey),
+			want: &SecurityCfg{},
+		},
 	}
 
 	badValueTests := []struct {
@@ -65,6 +75,10 @@ func TestSecurityCfgJSONParser(t *testing.T) {
 		{
 			name: "Bad version type",
 			json: fmt.Sprintf(`{"%s": "one"}`, SecurityCfgVersionJSONKey),
+		},
+		{
+			name: "Bad valid signature threshold type",
+			json: fmt.Sprintf(`{"%s": "one"}`, ValidSignatureThresholdJSONKey),
 		},
 		{
 			name: "Bad boot mode type",
@@ -113,4 +127,27 @@ func TestSecurityCfgJSONParser(t *testing.T) {
 		})
 	}
 
+}
+
+func TestBadSecurityCfgJSONParser(t *testing.T) {
+
+	t.Run("Invalid JSON", func(t *testing.T) {
+		j := SecurityCfgJSONParser{bytes.NewBufferString("bad json")}
+
+		_, err := j.Parse()
+
+		if err == nil {
+			t.Error("expect error but got none")
+		}
+	})
+
+	t.Run("Bad reader", func(t *testing.T) {
+		j := SecurityCfgJSONParser{&badReader{}}
+
+		_, err := j.Parse()
+
+		if err == nil {
+			t.Error("expect error but got none")
+		}
+	})
 }

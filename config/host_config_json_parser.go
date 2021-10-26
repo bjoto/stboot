@@ -193,7 +193,7 @@ func parseProvisioningURLs(r rawCfg, c *HostCfg) error {
 			for _, v := range array {
 				if urlStr, ok := v.(string); ok {
 					if urlStr != "" {
-						u, err := url.Parse(urlStr)
+						u, err := url.ParseRequestURI(urlStr)
 						if err != nil {
 							return &ParseError{key, err}
 						}
