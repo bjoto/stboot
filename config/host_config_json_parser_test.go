@@ -19,6 +19,23 @@ const (
 	goodURLString  = "http://server.com"
 )
 
+// Tests for the JSON parsing, only syntax, not semantics
+// 1. All field has to be present in the JSON structure
+// 2. No unknown fields can be present
+// 3. The fields must contain valid data
+
+type hostCfgJson struct {
+	Version          int      `json:"version"`
+	IPAddrMode       string   `json:"network_mode"`
+	HostIP           string   `json:"host_ip"`
+	DefaultGateway   string   `json:"gateway"`
+	DNSServer        string   `json:"dns"`
+	NetworkInterface string   `json:"network_interface"`
+	ProvisioningURLs []string `json:"provisioing_urls"`
+	ID               string   `json:"identity"`
+	Auth             string   `json:"authentication"`
+}
+
 func TestHostCfgJSONParser(t *testing.T) {
 	v := valuesFromGoodStrings(t)
 
